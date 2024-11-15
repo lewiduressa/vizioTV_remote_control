@@ -26,26 +26,23 @@ public class RemoteController {
     }
 
     private static SSLContext obtainCert(String hostname, int port) throws Exception{
-        String certFilePath = "C:/Users/lewig/Downloads/MT5581.prod.vizio.com"; // Path to your .crt file
+        String certFilePath = "C:/Users/lewig/Downloads/MT5581.prod.vizio.com";
 
-        // Load the SSL certificate from file
         X509Certificate serverCert = loadCertificate(certFilePath);
 
-        // Create SSL context with the loaded certificate
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[]{ new X509TrustManager() {
 
             @Override
             public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-                // Do nothing (accept all client certificates)
             }
 
             @Override
             public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
-                // Validate the server certificate here if needed
+
                 for (X509Certificate cert : xcs) {
                     if (cert.equals(serverCert)) {
-                        return; // Certificate is trusted
+                        return;
                     }
                 }
                 throw new CertificateException("Server certificate not trusted");
@@ -53,7 +50,7 @@ public class RemoteController {
 
             @Override
             public X509Certificate[] getAcceptedIssuers() {
-                return null; // Accept all issuers
+                return null;
             }
         }}, null);
 
@@ -99,9 +96,7 @@ public class RemoteController {
             writer.close();
 
             System.out.println("Response written");
-
-            // Parse response JSON and extract PAIRING_REQ_TOKEN and CHALLENGE_TYPE
-            // Handle the response according to your application's logic
+            
         } else {
             System.out.println("Request failed: HTTP error code " + responseCode);
         }
@@ -114,7 +109,7 @@ public class RemoteController {
         connection.setHostnameVerifier(new HostnameVerifier() {
             @Override
             public boolean verify(String hostname, SSLSession session) {
-                return true; // Accept all hostnames (disable verification)
+                return true;
             }
         });
 
@@ -139,10 +134,9 @@ public class RemoteController {
                 try {
                     String urlString = "https:/" + event.getInfo().getInet4Addresses()[0] + ":" + event.getInfo().getPort();
                     System.out.println(urlString);
-                    String deviceId = "12353"; // Replace with your actual device ID
-                    String deviceName = "Lewi"; // Replace with your actual device name
+                    String deviceId = "12353";
+                    String deviceName = "Lewi";
 
-                    // Construct JSON body
                     String body = "{\"DEVICE_NAME\": \"" + deviceName + "\", \"DEVICE_ID\": \"" + deviceId + "\"}";
                     SSLContext sslContext = obtainCert("192.168.1.66", 7345);
                     URL url;
@@ -167,15 +161,7 @@ public class RemoteController {
 
 
 
-//                    Thread.sleep(7000);
-//                    url = new URL(urlString + "/pairing/cancel");
-//                    scnr = new Scanner(System.in);
-//                    System.out.println("Enter pin: ");
-//                    String jsonString = "{\"DEVICE_ID\":\"" + deviceId + "\",\"CHALLENGE_TYPE\":" + 1 + ",\"RESPONSE_VALUE\":\"" + rVal + "\",\"PAIRING_REQ_TOKEN\":" + pToken + "}";
-//                    connection = setUpConnection(url, sslContext);
-//                    sendRequest(connection, "PUT", body);
-//                    //readResponse(connection);
-//                    connection.disconnect();
+
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -190,7 +176,6 @@ public class RemoteController {
             // Create a JmDNS instance
             JmDNS jmdns = JmDNS.create(InetAddress.getLocalHost());
 
-            // Add a service listener
             jmdns.addServiceListener("_viziocast._tcp.local.", new SampleListener());
 
             // Wait a bit
